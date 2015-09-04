@@ -5,6 +5,7 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
 from django_extensions.db.models import TimeStampedModel
+from django_countries.fields import CountryField
 
 from addressbook.conf import settings
 
@@ -32,7 +33,7 @@ class Address(TimeStampedModel):
     town = models.CharField(_('town'), max_length=50)
     county = models.CharField(_('county'), max_length=50, blank=True)
     postcode = models.CharField(_('postcode'), max_length=50)
-    country = models.ForeignKey(Country, verbose_name=_('country'))
+    country = CountryField(verbose_name=_('country'))
     status = models.IntegerField(_('status'), choices=STATUS, default=0)
 
 
@@ -60,7 +61,7 @@ class Address(TimeStampedModel):
     def _output_html(self, template, seperator=None):
         output = []
         for row in [self.contact_name, self.address_one, self.address_two,
-                    self.town, self.county, self.postcode, self.country]:
+                    self.town, self.county, self.postcode, self.country.name]:
             if row:
                 output.append(template % {'field': force_unicode(row)})
         if not seperator:

@@ -28,4 +28,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Utilities'
     ],
+    install_requires=[
+        'django-countries',
+    ],
 )
