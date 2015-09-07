@@ -17,6 +17,7 @@ setup(
     packages = [
         'addressbook',
         'addressbook.conf',
+        'addressbook.migrations',
     ],
     classifiers = [
         'Development Status :: 4 - Beta',
