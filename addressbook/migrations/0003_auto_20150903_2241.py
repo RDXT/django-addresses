@@ -11,9 +11,12 @@ def fix_countries(apps, schema_editor):
     Country = apps.get_model("addressbook", "Country")
     Address = apps.get_model("addressbook", "Address")
     for address in Address.objects.all():
-        c = Country.objects.get(pk=int(address.country))
-        address.country = c.iso_code
-        address.save()
+        try:
+            c = Country.objects.get(pk=int(address.country))
+            address.country = c.iso_code
+            address.save()
+        except ValueError:
+            pass
 
 
 class Migration(migrations.Migration):
