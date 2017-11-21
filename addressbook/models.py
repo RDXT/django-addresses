@@ -1,23 +1,22 @@
-from datetime import datetime
-
+from addressbook.conf import settings
 from django.db import models
 from django.utils.safestring import mark_safe
-from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext_lazy as _
-from django_extensions.db.models import TimeStampedModel
 from django_countries.fields import CountryField
+from django_extensions.db.models import TimeStampedModel
 
-from addressbook.conf import settings
+try:
+    from django.utils.encoding import force_text
+except ImportError:
+    from django.utils.encoding import force_text as force_text
 
 
 class Country(models.Model):
     iso_code = models.CharField(_('ISO code'), max_length=2, unique=True)
     name = models.CharField(_('name'), max_length=60)
 
-
     def __unicode__(self):
         return self.name
-
 
     class Meta:
         ordering = ['name']
@@ -36,7 +35,6 @@ class Address(TimeStampedModel):
     country = CountryField(verbose_name=_('country'))
     status = models.IntegerField(_('status'), choices=STATUS, default=0)
 
-
     def __init__(self, *args, **kwargs):
         if settings.NORMALISE_TO_UPPER:
             if 'contact_name' in kwargs:
@@ -53,25 +51,21 @@ class Address(TimeStampedModel):
                 kwargs['postcode'] = kwargs['postcode'].upper()
         super(Address, self).__init__(*args, **kwargs)
 
-
     def __unicode__(self):
         return self.contact_name
-
 
     def _output_html(self, template, seperator=None):
         output = []
         for row in [self.contact_name, self.address_one, self.address_two,
                     self.town, self.county, self.postcode, self.country.name]:
             if row:
-                output.append(template % {'field': force_unicode(row)})
+                output.append(template % {'field': force_text(row)})
         if not seperator:
             seperator = u'\n'
         return mark_safe(seperator.join(output))
 
-
     def as_p(self):
         return self._output_html(u'%(field)s', u'<br />\n')
-
 
     def save(self, *args, **kwargs):
         if settings.NORMALISE_TO_UPPER:
@@ -82,7 +76,6 @@ class Address(TimeStampedModel):
             self.county = self.county.upper()
             self.postcode = self.postcode.upper()
         super(Address, self).save(*args, **kwargs)
-
 
     class Meta:
         ordering = ['created']
